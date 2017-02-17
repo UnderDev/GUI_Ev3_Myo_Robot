@@ -9,5 +9,30 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+        <TextBlock x:Name="tblUpdates" Text="Updates" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="10, 20, 0, 0" />
+        <StackPanel Orientation="Horizontal" Margin="10,50, 0,0" HorizontalAlignment="Left" >
+            <TextBlock x:Name="tblXValue" Text="x: " Margin="5" Foreground="Red" FontSize="28"/>
+            <TextBlock x:Name="tblYValue" Text="x: " Margin="5" Foreground="Green" FontSize="28"/>
+            <TextBlock x:Name="tblZValue" Text="x: " Margin="5" Foreground="Blue" FontSize="28"/>
+            <TextBlock x:Name="tbHeight" Text="y: " Margin="5" Foreground="Blue" FontSize="28"/>
+        </StackPanel>
+
+
+        <Canvas x:Name="cvsLines" Visibility="Collapsed"  >
+            <Line x:Name="pitchLine" X1="200" Y1="350" X2="200" Y2="350" Stroke="Red" StrokeThickness="4" />
+            <Line x:Name="yawLine" X1="200" Y1="350" X2="200" Y2="350" Stroke="Green" StrokeThickness="4" />
+            <Line x:Name="rollLine" X1="200" Y1="350" X2="200" Y2="350" Stroke="Blue" StrokeThickness="4" />
+        </Canvas>
+
+        <StackPanel Orientation="Horizontal" Margin="0,500, 0,0" HorizontalAlignment="Center" >
+            <TextBlock x:Name="tblXGyro" Text="x: " Margin="5" Foreground="Red" FontSize="28"/>
+            <TextBlock x:Name="tblYGyro" Text="x: " Margin="5" Foreground="Green" FontSize="28"/>
+            <TextBlock x:Name="tblZGyro" Text="x: " Margin="5" Foreground="Blue" FontSize="28"/>
+        </StackPanel>
+
+        <Button x:Name="btnMyo" Content="Find Myo" HorizontalAlignment="Center" Margin="0, 0, 0, 25"
+                VerticalAlignment="Bottom" Click="btnMyo_Click"/>
+        <TextBlock x:Name="TbCurrentPose" HorizontalAlignment="Left" Margin="139,280,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+
     </Grid>
 </Page>

@@ -33,7 +33,6 @@ namespace GUI_Ev3_Myo_Robot
         {
             this.InitializeComponent();
             init();
-
         }
 
 

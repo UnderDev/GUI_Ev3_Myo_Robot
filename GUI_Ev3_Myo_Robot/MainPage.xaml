@@ -32,7 +32,10 @@
 
         <Button x:Name="btnMyo" Content="Find Myo" HorizontalAlignment="Center" Margin="0, 0, 0, 25"
                 VerticalAlignment="Bottom" Click="btnMyo_Click"/>
-        <TextBlock x:Name="TbCurrentPose" HorizontalAlignment="Left" Margin="139,280,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+
+        <ScrollViewer Margin="0,130,0,62" VerticalScrollMode="Enabled" >
+            <TextBlock x:Name="TbCurrentPose" HorizontalAlignment="Left" TextWrapping="Wrap"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled" VerticalAlignment="Top" Width="250"/>
+        </ScrollViewer>
 
     </Grid>
 </Page>

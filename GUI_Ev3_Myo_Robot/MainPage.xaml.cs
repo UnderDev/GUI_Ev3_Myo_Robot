@@ -47,7 +47,7 @@ namespace GUI_Ev3_Myo_Robot
         private IHub _myoHub1;
 
 
-        private  Pose _currentPose;
+        private Pose _currentPose;
         private double _currentRoll;
         private double _currentHeight;
 
@@ -61,7 +61,7 @@ namespace GUI_Ev3_Myo_Robot
             setupTimers();
             _orientationTimer.Start();
 
-           // init();
+            // init();
         }
 
 
@@ -79,103 +79,107 @@ namespace GUI_Ev3_Myo_Robot
         private void _orientationTimer_Tick(object sender, object e)
         {
 
-            //Start and Stop the Robot Connection
-            if (_currentPose == Pose.FingersSpread)
-            {
+            ////Start and Stop the Robot Connection
+            //if (_currentPose == Pose.FingersSpread)
+            //{
+            //    TbCurrentPose.Text += "\n Magic Happens In Scots Fingers";
+            //    if (_isRobotConnected == false)
+            //        //BrickInit();
 
-                if (_isRobotConnected==false)
-                    //BrickInit();
-
-                if (_startRobot)
-                    _startRobot = false;
-                else
-                    _startRobot = true;        
-            }
+            //        if (_startRobot)
+            //            _startRobot = false;
+            //        else
+            //            _startRobot = true;
+            //}
 
             //If The Robot Is Connected and Started
-            if (_startRobot && _isRobotConnected)
-            {
-                #region Roll
-                //if (_currentRoll >= 0)
-                //{   // Move Left
-                //    //eMyo.SetValue(Canvas.LeftProperty, (double)eMyo.GetValue(Canvas.LeftProperty) - 10);
-                //}
-                //else if (_currentRoll <= 0)
-                //{   // Move Right
-                //    //eMyo.SetValue(Canvas.LeftProperty, (double)eMyo.GetValue(Canvas.LeftProperty) + 10);
-                //}
-                //else
-                //{
-                //    //Stop 
-                //}
-                #endregion
+            //if (_startRobot && _isRobotConnected)
+            //if (_startRobot)
+            //{
+            //    #region Roll
+            //    //if (_currentRoll >= 0)
+            //    //{   // Move Left
+            //    //    //eMyo.SetValue(Canvas.LeftProperty, (double)eMyo.GetValue(Canvas.LeftProperty) - 10);
+            //    //}
+            //    //else if (_currentRoll <= 0)
+            //    //{   // Move Right
+            //    //    //eMyo.SetValue(Canvas.LeftProperty, (double)eMyo.GetValue(Canvas.LeftProperty) + 10);
+            //    //}
+            //    //else
+            //    //{
+            //    //    //Stop 
+            //    //}
+            //    #endregion
 
-                if (_currentPose == Pose.DoubleTap)
-                {
-                    if (_liftCheck)
-                    {
-                        //LIFT UP
-                        RobotLift();
-                    }
-                    else{
-                        //DROP
-                        RobotDrop();
-                    }
-                    //LIFT
-                }
-
-
-                if (_currentPose == Pose.Fist)
-                {
-                    //FOWARD
-                    if (_F_B_Check)
-                    {
-                        RobotFoward();
-                    }
-                    else
-                    {
-                        //BACKWARDS
-                        RobotBackward();
-                    }
-                    //LIFT
-                }
-
-                if (_currentPose == Pose.WaveIn)
-                {
-                    //Turn LEFT
-                    RobotLeft();
-                }
+            //    if (_currentPose == Pose.DoubleTap)
+            //    {
+            //        if (_liftCheck)
+            //        {
+            //            //LIFT UP
+            //            RobotLift();
+            //        }
+            //        else
+            //        {
+            //            //DROP
+            //            RobotDrop();
+            //        }
+            //        //LIFT
+            //    }
 
 
-                if (_currentPose == Pose.WaveIn)
-                {
-                    //Turn RIGHT
-                    RobotRight();
-                }
+            //    if (_currentPose == Pose.Fist)
+            //    {
+            //        //FOWARD
+            //        if (_F_B_Check)
+            //        {
+            //            RobotFoward();
+            //            _F_B_Check = false;
+            //        }
+            //        else
+            //        {
+            //            //BACKWARDS
+            //            RobotBackward();
+            //            _F_B_Check = true;
+            //        }
+            //    }
+
+            //    if (_currentPose == Pose.WaveIn)
+            //    {
+            //        //Turn LEFT
+            //        RobotLeft();
+            //    }
 
 
-                if (_currentHeight >= 0)
-                {   // move to the down
-                    //eMyo.SetValue(Canvas.TopProperty, (double)eMyo.GetValue(Canvas.TopProperty) - 10);
-                }
-                else
-                {   // movet to the up
-                    //eMyo.SetValue(Canvas.TopProperty, (double)eMyo.GetValue(Canvas.TopProperty) + 10);
-                }
+            //    if (_currentPose == Pose.WaveOut)
+            //    {
+            //        //Turn RIGHT
+            //        RobotRight();
+            //    }
 
-                //if ((double)eMyo.GetValue(Canvas.LeftProperty) <= 0 || (double)eMyo.GetValue(Canvas.LeftProperty) >= 0)
-                //{
-                //tbHeight.Text = "Width";
-                //}
-                //else if ((double)eMyo.GetValue(Canvas.TopProperty) <= 0 || (double)eMyo.GetValue(Canvas.TopProperty) >= 0)
-                // {
-                //tbHeight.Text = "height";
-                //}
-                // else
-                //{
-                //tbHeight.Text = "";
-                //}
-            }
+            //    #region Pitch
+            //    //if (_currentHeight >= 0)
+            //    //{   // move to the down
+            //    //    //eMyo.SetValue(Canvas.TopProperty, (double)eMyo.GetValue(Canvas.TopProperty) - 10);
+            //    //}
+            //    //else
+            //    //{   // movet to the up
+            //    //    //eMyo.SetValue(Canvas.TopProperty, (double)eMyo.GetValue(Canvas.TopProperty) + 10);
+            //    //}
+
+            //    //if ((double)eMyo.GetValue(Canvas.LeftProperty) <= 0 || (double)eMyo.GetValue(Canvas.LeftProperty) >= 0)
+            //    //{
+            //    //tbHeight.Text = "Width";
+            //    //}
+            //    //else if ((double)eMyo.GetValue(Canvas.TopProperty) <= 0 || (double)eMyo.GetValue(Canvas.TopProperty) >= 0)
+            //    // {
+            //    //tbHeight.Text = "height";
+            //    //}
+            //    // else
+            //    //{
+            //    //tbHeight.Text = "";
+            //    //}
+            //    #endregion
+            //}
 
         }
         #endregion
@@ -218,7 +222,7 @@ namespace GUI_Ev3_Myo_Robot
         {
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                tblUpdates.Text = tblUpdates.Text + System.Environment.NewLine +"Myo disconnected";
+                tblUpdates.Text = tblUpdates.Text + System.Environment.NewLine + "Myo disconnected";
             });
             _myoHub.MyoConnected -= _myoHub_MyoConnected;
             _myoHub.MyoDisconnected -= _myoHub_MyoDisconnected;
@@ -273,7 +277,7 @@ namespace GUI_Ev3_Myo_Robot
         {
             var pitchDegree = (x * 180.0) / Math.PI;
             var yawDegree = (y * 180.0) / Math.PI;
-            var rollDegree = (z * 180.0) /Math.PI;
+            var rollDegree = (z * 180.0) / Math.PI;
 
             tblXGyro.Text = "Gyro X: " + (pitchDegree).ToString("0.00");
             tblYGyro.Text = "Gyro Y: " + (yawDegree).ToString("0.00");
@@ -341,32 +345,76 @@ namespace GUI_Ev3_Myo_Robot
                 //Sets the _currentPose to the current pose
                 _currentPose = curr;
 
-                switch (curr)
+                if(curr == Pose.FingersSpread)
+                StartRobotCommands();
+
+                if (_startRobot)
                 {
-                    case Pose.Rest:
-                        //eMyo.Fill = new SolidColorBrush(Colors.Blue);
-                        break;
-                    case Pose.Fist:
-                        //eMyo.Fill = new SolidColorBrush(Colors.Red);
-                        break;
-                    case Pose.WaveIn:
-                        break;
-                    case Pose.WaveOut:
-                        break;
-                    case Pose.FingersSpread:
-                        break;
-                    case Pose.DoubleTap:
-                        break;
-                    case Pose.Unknown:
-                        break;
-                    default:
-                        break;
+                    switch (curr)
+                    {
+                        case Pose.Rest:
+                            break;
+                        case Pose.Fist:
+                            //FOWARD
+                            if (_F_B_Check)
+                            {
+                                RobotFoward();
+                                _F_B_Check = false;
+                            }
+                            else
+                            {
+                                //BACKWARDS
+                                RobotBackward();
+                                _F_B_Check = true;
+                            }
+                            break;
+                        case Pose.WaveIn:
+                            RobotLeft();
+                            break;
+                        case Pose.WaveOut:
+                            RobotRight();
+                            break;
+                        case Pose.FingersSpread:
+                            //StartRobotCommands();
+                            break;
+                        case Pose.DoubleTap:
+                            //LIFT UP
+                            if (_liftCheck)
+                            {
+                                RobotPickUp();
+                                _liftCheck = false;
+                            }
+                            //DROP
+                            else
+                            {
+                                RobotDrop();
+                                _liftCheck = true;
+                            }
+
+                            //LIFT
+                            break;
+                        case Pose.Unknown:
+                            break;
+                        default:
+                            break;
+                    }
                 }
             });
         }
         #endregion
 
 
+        private void StartRobotCommands()
+        {
+            TbCurrentPose.Text += "\n Magic Happens In Scotts Fingers";
+            //if (_isRobotConnected == false)
+            //BrickInit();
+
+            //if (_startRobot)
+            //    _startRobot = false;
+            //else
+            _startRobot = true;
+        }
 
 
         private void BrickInit()
@@ -375,7 +423,7 @@ namespace GUI_Ev3_Myo_Robot
 
             _brick.BrickChanged += _brick_BrickChanged;
 
-           connectToBrick();//Connects to the brick
+            connectToBrick();//Connects to the brick
         }
 
         private async void connectToBrick()
@@ -388,59 +436,68 @@ namespace GUI_Ev3_Myo_Robot
 
 
         #region Robot Commands Movments Etc
-        private async void RobotFoward()
+
+        private void RobotFoward()
         {
-            await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 60);
+            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
+            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 60);
             TbCurrentPose.Text += "\n RobotFoward() Pose.Fist";
         }
 
-        private async void RobotBackward()
+        private void RobotBackward()
         {
-            await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A | OutputPort.B, -60);
+            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
+            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A | OutputPort.B, -60);
             TbCurrentPose.Text += "\n RobotBackward()  Pose.Fist";
         }
 
-        private async void RobotRight()
+        private void RobotRight()
         {
-            await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 60);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 30);
+            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
+            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 60);
+            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 30);
             TbCurrentPose.Text += "\n RobotRight()  Pose.WaveOut";
         }
 
-        private async void RobotLeft()
+        private void RobotLeft()
         {
-            await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 60);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 30);
+            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
+            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 60);
+            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 30);
             TbCurrentPose.Text += "\n RobotLeft() Pose.WaveIn";
         }
 
-        private async void RobotLift()
+        private void RobotPickUp()
         {
-            await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, 60, 3000, true);
-            TbCurrentPose.Text += "\n RobotLift() Pose.DoubleTap";
+            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
+            //await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, 60, 3000, true);
+            TbCurrentPose.Text += "\n RobotPickUp() Pose.DoubleTap";
         }
 
-        private async void RobotDrop()
+        private void RobotDrop()
         {
-            await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, -60, 3000, true);
+            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
+            //await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, -60, 3000, true);
             TbCurrentPose.Text += "\n RobotDrop() Pose.DoubleTap";
         }
-        #endregion 
+        #endregion
 
 
+        private void _brick_BrickChanged(object sender, BrickChangedEventArgs e)
+        {
+            //Print out Port (Ones) value to the Console.
+            Debug.WriteLine("Port A Results: " + e.Ports[InputPort.A].SIValue);
+        }
+
+
+
+        #region Sample Command Methods
         // Set Polarity of the motors (what way they spin)
         private async void MotorPolarity()
         {
             await _brick.DirectCommand.SetMotorPolarity(OutputPort.A | OutputPort.B, Polarity.Forward);
         }
 
-        #region Sample Command Methods
         //Direct Command  
         private async void DirectComands()
         {
@@ -472,12 +529,6 @@ namespace GUI_Ev3_Myo_Robot
         #endregion
 
 
-        private void _brick_BrickChanged(object sender, BrickChangedEventArgs e)
-        {
-            //Print out Port (Ones) value to the Console.
-            Debug.WriteLine("Port A Results: "+e.Ports[InputPort.A].SIValue);
-        }
 
-
-        }
+    }
 }

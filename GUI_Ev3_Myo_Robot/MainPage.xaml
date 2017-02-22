@@ -30,8 +30,11 @@
             <TextBlock x:Name="tblZGyro" Text="x: " Margin="5" Foreground="Blue" FontSize="28"/>
         </StackPanel>
 
-        <Button x:Name="btnMyo" Content="Find Myo" HorizontalAlignment="Center" Margin="0, 0, 0, 25"
+        <Button x:Name="btnMyo" Content="Find Myo" HorizontalAlignment="Center" Margin="70,0,207,24"
                 VerticalAlignment="Bottom" Click="btnMyo_Click"/>
+
+        <Button x:Name="Disconnect" Content="Stop EV3" HorizontalAlignment="Center" Margin="222,0,59,25"
+                VerticalAlignment="Bottom" Click="Disconnect_Click" />
 
         <ScrollViewer Margin="0,130,0,62" VerticalScrollMode="Enabled" >
             <TextBlock x:Name="TbCurrentPose" HorizontalAlignment="Left" TextWrapping="Wrap"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled" VerticalAlignment="Top" Width="250"/>

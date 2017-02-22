@@ -61,7 +61,6 @@ namespace GUI_Ev3_Myo_Robot
             setupTimers();
             _orientationTimer.Start();
 
-            // init();
         }
 
 
@@ -348,25 +347,16 @@ namespace GUI_Ev3_Myo_Robot
                 if(curr == Pose.FingersSpread)
                 StartRobotCommands();
 
-                if (_startRobot)
+                if (_startRobot && _isRobotConnected)
                 {
                     switch (curr)
                     {
                         case Pose.Rest:
+                            RobotStop();
                             break;
                         case Pose.Fist:
                             //FOWARD
-                            if (_F_B_Check)
-                            {
-                                RobotFoward();
-                                _F_B_Check = false;
-                            }
-                            else
-                            {
-                                //BACKWARDS
-                                RobotBackward();
-                                _F_B_Check = true;
-                            }
+                            RobotFoward();
                             break;
                         case Pose.WaveIn:
                             RobotLeft();
@@ -375,22 +365,11 @@ namespace GUI_Ev3_Myo_Robot
                             RobotRight();
                             break;
                         case Pose.FingersSpread:
-                            //StartRobotCommands();
+                            RobotBackward();
                             break;
                         case Pose.DoubleTap:
                             //LIFT UP
-                            if (_liftCheck)
-                            {
                                 RobotPickUp();
-                                _liftCheck = false;
-                            }
-                            //DROP
-                            else
-                            {
-                                RobotDrop();
-                                _liftCheck = true;
-                            }
-
                             //LIFT
                             break;
                         case Pose.Unknown:
@@ -403,12 +382,15 @@ namespace GUI_Ev3_Myo_Robot
         }
         #endregion
 
-
+        private int count = 0;
         private void StartRobotCommands()
         {
             TbCurrentPose.Text += "\n Magic Happens In Scotts Fingers";
             //if (_isRobotConnected == false)
-            //BrickInit();
+            if(count == 0)
+            BrickInit();
+
+            count++;
 
             //if (_startRobot)
             //    _startRobot = false;
@@ -419,7 +401,7 @@ namespace GUI_Ev3_Myo_Robot
 
         private void BrickInit()
         {
-            _brick = new Brick(new NetworkCommunication("192.168.0.36"));
+            _brick = new Brick(new NetworkCommunication("192.168.0.13"));
 
             _brick.BrickChanged += _brick_BrickChanged;
 
@@ -430,6 +412,7 @@ namespace GUI_Ev3_Myo_Robot
         {
             await _brick.ConnectAsync();
 
+            await _brick.DirectCommand.PlayToneAsync(30, 2000, 3000);
             //Return True when connected
             _isRobotConnected = true;
         }
@@ -437,47 +420,47 @@ namespace GUI_Ev3_Myo_Robot
 
         #region Robot Commands Movments Etc
 
-        private void RobotFoward()
+        private async void RobotFoward()
         {
-            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 60);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A | OutputPort.B, 100);
             TbCurrentPose.Text += "\n RobotFoward() Pose.Fist";
         }
 
-        private void RobotBackward()
+        private async void RobotStop()
         {
-            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A | OutputPort.B, -60);
+            await _brick.DirectCommand.StopMotorAsync(OutputPort.A | OutputPort.B,true);
+            TbCurrentPose.Text += "\n RobotFoward() Pose.Fist";
+        }
+
+        private async void RobotBackward()
+        {
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A | OutputPort.B, -100);
             TbCurrentPose.Text += "\n RobotBackward()  Pose.Fist";
         }
 
-        private void RobotRight()
+        private async void RobotRight()
         {
-            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 60);
-            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 30);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 100);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 60);
             TbCurrentPose.Text += "\n RobotRight()  Pose.WaveOut";
         }
 
-        private void RobotLeft()
+        private async void RobotLeft()
         {
-            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 60);
-            //await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 30);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 60);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 100);
             TbCurrentPose.Text += "\n RobotLeft() Pose.WaveIn";
         }
 
-        private void RobotPickUp()
+        private async void RobotPickUp()
         {
-            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            //await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, 60, 3000, true);
+            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, 30, 1500, true);
             TbCurrentPose.Text += "\n RobotPickUp() Pose.DoubleTap";
         }
 
-        private void RobotDrop()
+        private async void RobotDrop()
         {
-            //await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-            //await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, -60, 3000, true);
+            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, -30, 1500, true);
             TbCurrentPose.Text += "\n RobotDrop() Pose.DoubleTap";
         }
         #endregion
@@ -501,8 +484,6 @@ namespace GUI_Ev3_Myo_Robot
         //Direct Command  
         private async void DirectComands()
         {
-            await _brick.DirectCommand.PlayToneAsync(100, 1000, 300);
-
             await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.A, 60, 3000, true);
             await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.A | OutputPort.B, 60, 3000, true);
             // Motor in Port A At 60% Power Constant
@@ -516,7 +497,6 @@ namespace GUI_Ev3_Myo_Robot
         private async void BatchComands()
         {
             _brick.BatchCommand.TurnMotorAtPower(OutputPort.A, 60);
-            _brick.BatchCommand.PlayTone(100, 1200, 300);
             await _brick.BatchCommand.SendCommandAsync();
         }
 
@@ -526,9 +506,21 @@ namespace GUI_Ev3_Myo_Robot
             await _brick.SystemCommand.CopyFileAsync("test.rdf", "../prjs/myApp/Test1.rsf");
             await _brick.DirectCommand.PlaySoundAsync(100, "../prjs/myApp/Test1");
         }
+
+
         #endregion
 
+        private void Disconnect_Click(object sender, RoutedEventArgs e)
+        {
+            shutBrickDown();
+        }
 
-
+        private async void shutBrickDown()
+        {
+            await _brick.DirectCommand.StopMotorAsync(OutputPort.All,true);
+            await _brick.DirectCommand.PlayToneAsync(30,2000,300);
+            _brick.Disconnect();
+            _isRobotConnected = false;
+        }
     }
 }

@@ -36,10 +36,8 @@ namespace GUI_Ev3_Myo_Robot
         private Brick _brick;
 
         private Boolean _startRobot = false;
-        private Boolean _liftCheck = false;
-        private Boolean _F_B_Check = false;
         private Boolean _isRobotConnected = false;
-
+        private float _DirectionValue;
 
         private MyoSharp.Communication.IChannel _myoChannel;
         private MyoSharp.Communication.IChannel _myoChannel1;
@@ -58,13 +56,91 @@ namespace GUI_Ev3_Myo_Robot
         {
             this.InitializeComponent();
 
-            setupTimers();
-            _orientationTimer.Start();
+            //setupTimers();
+            //_orientationTimer.Start();
+        }
 
+        #region Myo Setup Methods - Used
+        //Button Event to Connect to the myo 
+        private void btnMyo_Click(object sender, RoutedEventArgs e)
+        { // communication, device, exceptions, poses
+
+            // create the channel
+            _myoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
+                                    MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
+
+            // Create the hub with the channel
+            _myoHub = MyoSharp.Device.Hub.Create(_myoChannel);
+
+            // Create the event handlers for connect and disconnect
+            _myoHub.MyoConnected += _myoHub_MyoConnected;
+            _myoHub.MyoDisconnected += _myoHub_MyoDisconnected;
+
+            // Start listening 
+            _myoChannel.StartListening();
+
+            // Create the channel
+            _myoChannel1 = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
+                                    MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
+
+            // create the hub with the channel
+            _myoHub1 = MyoSharp.Device.Hub.Create(_myoChannel1);
+
+            // create the event handlers for connect and disconnect
+            _myoHub1.MyoConnected += _myoHub_MyoConnected;
+            _myoHub1.MyoDisconnected += _myoHub_MyoDisconnected;
+
+            // Start listening 
+            _myoChannel1.StartListening();
+        }
+
+        private async void _myoHub_MyoDisconnected(object sender, MyoEventArgs e)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                tblUpdates.Text = tblUpdates.Text + System.Environment.NewLine + "Myo disconnected";
+            });
+            _myoHub.MyoConnected -= _myoHub_MyoConnected;
+            _myoHub.MyoDisconnected -= _myoHub_MyoDisconnected;
+            _orientationTimer.Stop();
         }
 
 
-        #region timers methods
+        private async void _myoHub_MyoConnected(object sender, MyoEventArgs e)
+        {
+            //Alert the Myo that its connected
+            e.Myo.Vibrate(VibrationType.Long);
+
+            //Update the text box that the myo is connected
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                tblUpdates.Text = "Myo Connected: " + e.Myo.Handle;
+            });
+
+            // add the pose changed event here
+            e.Myo.PoseChanged += Myo_PoseChanged;
+            e.Myo.OrientationDataAcquired += Myo_OrientationDataAcquired;
+            e.Myo.GyroscopeDataAcquired += Myo_GyroscopeDataAcquired;
+
+            // Unlock the Myo so that it doesn't keep locking between our poses
+            e.Myo.Unlock(UnlockType.Hold);
+
+            try
+            {
+                var sequence = PoseSequence.Create(e.Myo, Pose.FingersSpread, Pose.WaveIn);
+                sequence.PoseSequenceCompleted += Sequence_PoseSequenceCompleted;
+
+            }
+            catch (Exception myoErr)
+            {
+                string strMsg = myoErr.Message;
+            }
+
+        }
+        #endregion
+
+
+        #region timers methods - Not Used
         private void setupTimers()
         {
             if (_orientationTimer == null)
@@ -183,86 +259,7 @@ namespace GUI_Ev3_Myo_Robot
         }
         #endregion
 
-        #region Myo Setup Methods
-        //Button Event to Connect to the myo 
-        private void btnMyo_Click(object sender, RoutedEventArgs e)
-        { // communication, device, exceptions, poses
-
-            // create the channel
-            _myoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
-                                    MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
-
-            // Create the hub with the channel
-            _myoHub = MyoSharp.Device.Hub.Create(_myoChannel);
-
-            // Create the event handlers for connect and disconnect
-            _myoHub.MyoConnected += _myoHub_MyoConnected;
-            _myoHub.MyoDisconnected += _myoHub_MyoDisconnected;
-
-            // Start listening 
-            _myoChannel.StartListening();
-
-            // Create the channel
-            _myoChannel1 = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
-                                    MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
-
-            // create the hub with the channel
-            _myoHub1 = MyoSharp.Device.Hub.Create(_myoChannel1);
-
-            // create the event handlers for connect and disconnect
-            _myoHub1.MyoConnected += _myoHub_MyoConnected;
-            _myoHub1.MyoDisconnected += _myoHub_MyoDisconnected;
-
-            // Start listening 
-            _myoChannel1.StartListening();
-        }
-
-        private async void _myoHub_MyoDisconnected(object sender, MyoEventArgs e)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                tblUpdates.Text = tblUpdates.Text + System.Environment.NewLine + "Myo disconnected";
-            });
-            _myoHub.MyoConnected -= _myoHub_MyoConnected;
-            _myoHub.MyoDisconnected -= _myoHub_MyoDisconnected;
-            _orientationTimer.Stop();
-        }
-
-
-        private async void _myoHub_MyoConnected(object sender, MyoEventArgs e)
-        {
-            //Alert the Myo that its connected
-            e.Myo.Vibrate(VibrationType.Long);
-
-            //Update the text box that the myo is connected
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                tblUpdates.Text = "Myo Connected: " + e.Myo.Handle;
-            });
-
-            // add the pose changed event here
-            e.Myo.PoseChanged += Myo_PoseChanged;
-            e.Myo.OrientationDataAcquired += Myo_OrientationDataAcquired;
-            e.Myo.GyroscopeDataAcquired += Myo_GyroscopeDataAcquired;
-
-            // Unlock the Myo so that it doesn't keep locking between our poses
-            e.Myo.Unlock(UnlockType.Hold);
-
-            try
-            {
-                var sequence = PoseSequence.Create(e.Myo, Pose.FingersSpread, Pose.WaveIn);
-                sequence.PoseSequenceCompleted += Sequence_PoseSequenceCompleted;
-
-            }
-            catch (Exception myoErr)
-            {
-                string strMsg = myoErr.Message;
-            }
-
-        }
-        #endregion
-
-        #region Gryoscope data
+        #region Gryoscope data - Not Used
         private async void Myo_GyroscopeDataAcquired(object sender, GyroscopeDataEventArgs e)
         {
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -278,13 +275,13 @@ namespace GUI_Ev3_Myo_Robot
             var yawDegree = (y * 180.0) / Math.PI;
             var rollDegree = (z * 180.0) / Math.PI;
 
-            tblXGyro.Text = "Gyro X: " + (pitchDegree).ToString("0.00");
-            tblYGyro.Text = "Gyro Y: " + (yawDegree).ToString("0.00");
-            tblZGyro.Text = "Gyro R: " + (rollDegree).ToString("0.00");
+           // tblXGyro.Text = "Gyro X: " + (pitchDegree).ToString("0.00");
+           // tblYGyro.Text = "Gyro Y: " + (yawDegree).ToString("0.00");
+           // tblZGyro.Text = "Gyro R: " + (rollDegree).ToString("0.00");
         }
         #endregion
 
-        #region Accelerometer Orientation Data
+        #region Accelerometer Orientation Data - Not Used
         private async void Myo_OrientationDataAcquired(object sender, OrientationDataEventArgs e)
         {
             _currentRoll = e.Roll;
@@ -303,18 +300,18 @@ namespace GUI_Ev3_Myo_Robot
             var yawDegree = (yaw * 180.0) / Math.PI;
             var rollDegree = (roll * 180.0) / Math.PI;
 
-            tblXValue.Text = "Pitch: " + (pitchDegree).ToString("0.00");
+            /*tblXValue.Text = "Pitch: " + (pitchDegree).ToString("0.00");
             tblYValue.Text = "Yaw: " + (yawDegree).ToString("0.00");
             tblZValue.Text = "Roll: " + (rollDegree).ToString("0.00");
 
             pitchLine.X2 = pitchLine.X1 + pitchDegree;
             yawLine.Y2 = yawLine.Y1 - yawDegree;
             rollLine.X2 = rollLine.X1 - rollDegree;
-            rollLine.Y2 = rollLine.Y1 + rollDegree;
+            rollLine.Y2 = rollLine.Y1 + rollDegree;*/
         }
         #endregion
 
-        #region Pose related methods
+        #region Pose related methods - Not Used
 
         private async void Sequence_PoseSequenceCompleted(object sender, PoseSequenceEventArgs e)
         {
@@ -332,13 +329,15 @@ namespace GUI_Ev3_Myo_Robot
             });
 
         }
+        #endregion
 
-
+        //Gets the current Pose From the user and fires off the Command associated
         private async void Myo_PoseChanged(object sender, PoseEventArgs e)
         {
             Pose curr = e.Pose;
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
+                //Displays the Current Pose To the Screen
                 tblUpdates.Text = curr.ToString();
 
                 //Sets the _currentPose to the current pose
@@ -355,7 +354,6 @@ namespace GUI_Ev3_Myo_Robot
                             RobotStop();
                             break;
                         case Pose.Fist:
-                            //FOWARD
                             RobotFoward();
                             break;
                         case Pose.WaveIn:
@@ -368,9 +366,6 @@ namespace GUI_Ev3_Myo_Robot
                             RobotBackward();
                             break;
                         case Pose.DoubleTap:
-                            //LIFT UP
-                                RobotPickUp();
-                            //LIFT
                             break;
                         case Pose.Unknown:
                             break;
@@ -380,21 +375,17 @@ namespace GUI_Ev3_Myo_Robot
                 }
             });
         }
-        #endregion
 
         private int count = 0;
         private void StartRobotCommands()
         {
-            TbCurrentPose.Text += "\n Magic Happens In Scotts Fingers";
+            TbCurrentPose.Text += "\n Magic Fingers";
             //if (_isRobotConnected == false)
-            if(count == 0)
+            //Initialize the Brick Once
+            if (count == 0)
             BrickInit();
 
             count++;
-
-            //if (_startRobot)
-            //    _startRobot = false;
-            //else
             _startRobot = true;
         }
 
@@ -412,66 +403,94 @@ namespace GUI_Ev3_Myo_Robot
         {
             await _brick.ConnectAsync();
 
-            await _brick.DirectCommand.PlayToneAsync(30, 2000, 3000);
+            await _brick.DirectCommand.PlayToneAsync(10, 2000, 3000);
             //Return True when connected
             _isRobotConnected = true;
         }
 
 
-        #region Robot Commands Movments Etc
+        #region Robot Commands Movments Etc Used
 
+        //Move Robot Fowards - Fist
         private async void RobotFoward()
         {
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A | OutputPort.B, 100);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D | OutputPort.C, 100);
+
+            //Keep track of where the Robot is pointing eg left right center
+
+            //_brick.BatchCommand.TurnMotorAtPower(OutputPort.D | OutputPort.C, 100);
+            //_brick.BatchCommand.TurnMotorAtSpeedForTime(OutputPort.B, 10, 1500, true);
+
+            //Send the Batch Commands listed Above
+            //await _brick.BatchCommand.SendCommandAsync();
+
             TbCurrentPose.Text += "\n RobotFoward() Pose.Fist";
         }
 
+        //Stop All The Motors - Rest
         private async void RobotStop()
         {
-            await _brick.DirectCommand.StopMotorAsync(OutputPort.A | OutputPort.B,true);
+            await _brick.DirectCommand.StopMotorAsync(OutputPort.All, true);
             TbCurrentPose.Text += "\n RobotFoward() Pose.Fist";
         }
 
+        //Move Robot Backwards - FingerSpread
         private async void RobotBackward()
         {
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A | OutputPort.B, -100);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D | OutputPort.C, -100);
             TbCurrentPose.Text += "\n RobotBackward()  Pose.Fist";
         }
 
+        //Move Robot Right - Wave Out
         private async void RobotRight()
         {
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 100);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 60);
+             _brick.BatchCommand.TurnMotorAtPower(OutputPort.D | OutputPort.C, 100);
+             _brick.BatchCommand.TurnMotorAtSpeedForTime(OutputPort.B, 10 , 1500 , true);
+
+            //Send the Batch Commands listed Above
+            await _brick.BatchCommand.SendCommandAsync();
+
             TbCurrentPose.Text += "\n RobotRight()  Pose.WaveOut";
         }
 
+        //Move Robot Right - Wave In
         private async void RobotLeft()
         {
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.A, 60);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.B, 100);
-            TbCurrentPose.Text += "\n RobotLeft() Pose.WaveIn";
-        }
+            _brick.BatchCommand.TurnMotorAtPower(OutputPort.D | OutputPort.C, 100);
+            _brick.BatchCommand.TurnMotorAtSpeedForTime(OutputPort.B, -10, 1500, true);
 
-        private async void RobotPickUp()
-        {
-            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, 30, 1500, true);
-            TbCurrentPose.Text += "\n RobotPickUp() Pose.DoubleTap";
-        }
+            //Send the Batch Commands listed Above
+            await _brick.BatchCommand.SendCommandAsync();
 
-        private async void RobotDrop()
-        {
-            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.C, -30, 1500, true);
-            TbCurrentPose.Text += "\n RobotDrop() Pose.DoubleTap";
+            TbCurrentPose.Text += "\n RobotLeft()  Pose.WaveIn";
         }
         #endregion
 
 
+        //Event Fired when the brick changes
         private void _brick_BrickChanged(object sender, BrickChangedEventArgs e)
         {
-            //Print out Port (Ones) value to the Console.
-            Debug.WriteLine("Port A Results: " + e.Ports[InputPort.A].SIValue);
+            Debug.WriteLine("Port A Results: " + e.Ports[InputPort.Four].PercentValue);
+
+            //Maby get the value from the Port 4(eyes) and stop it from crashing
+            _DirectionValue =  e.Ports[InputPort.Four].PercentValue;
         }
 
+        //Button Event to call shutBrickDown();
+        private void Disconnect_Click(object sender, RoutedEventArgs e)
+        {
+            shutBrickDown();
+        }
+
+        //Method Shuts Down The Brick And Stops All Motors
+        private async void shutBrickDown()
+        {
+            await _brick.DirectCommand.StopMotorAsync(OutputPort.All,true);
+            await _brick.DirectCommand.PlayToneAsync(10,2000,300);
+
+            _brick.Disconnect();
+            _isRobotConnected = false;
+        }
 
 
         #region Sample Command Methods
@@ -509,18 +528,5 @@ namespace GUI_Ev3_Myo_Robot
 
 
         #endregion
-
-        private void Disconnect_Click(object sender, RoutedEventArgs e)
-        {
-            shutBrickDown();
-        }
-
-        private async void shutBrickDown()
-        {
-            await _brick.DirectCommand.StopMotorAsync(OutputPort.All,true);
-            await _brick.DirectCommand.PlayToneAsync(30,2000,300);
-            _brick.Disconnect();
-            _isRobotConnected = false;
-        }
     }
 }

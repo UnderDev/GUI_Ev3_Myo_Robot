@@ -107,6 +107,13 @@
     <None Include="GUI_Ev3_Myo_Robot_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\FingerSpread.png" />
+    <Content Include="Assets\Fist.png" />
+    <Content Include="Assets\MYO Command Instructons.png" />
+    <Content Include="Assets\Pinch.png" />
+    <Content Include="Assets\WaveIn.png" />
+    <Content Include="Assets\WaveOut.png" />
+    <Content Include="Assets\BackGroundImage.jpg" />
     <Content Include="MyoSharp.dll" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />

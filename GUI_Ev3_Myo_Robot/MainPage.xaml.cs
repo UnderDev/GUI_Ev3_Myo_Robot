@@ -20,6 +20,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -337,6 +338,7 @@ namespace GUI_Ev3_Myo_Robot
             Pose curr = e.Pose;
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
+                BitmapImage bitmapImage;
                 //Displays the Current Pose To the Screen
                 tblUpdates.Text = curr.ToString();
 
@@ -353,20 +355,36 @@ namespace GUI_Ev3_Myo_Robot
                         case Pose.Rest:
                             RobotStop();
                             break;
+
                         case Pose.Fist:
                             RobotFoward();
+                            bitmapImage = new BitmapImage(new Uri("ms-appx://GUI_Ev3_Myo_Robot/Assets/Fist.png"));
+                            ImgCurPose.Source = bitmapImage;
                             break;
+
                         case Pose.WaveIn:
                             RobotLeft();
+                            bitmapImage = new BitmapImage(new Uri("ms-appx://GUI_Ev3_Myo_Robot/Assets/WaveIn.png"));
+                            ImgCurPose.Source = bitmapImage;
                             break;
+
                         case Pose.WaveOut:
                             RobotRight();
+                            bitmapImage = new BitmapImage(new Uri("ms-appx://GUI_Ev3_Myo_Robot/Assets/WaveOut.png"));
+                            ImgCurPose.Source = bitmapImage;
                             break;
+
                         case Pose.FingersSpread:
                             RobotBackward();
+                            bitmapImage = new BitmapImage(new Uri("ms-appx://GUI_Ev3_Myo_Robot/Assets/FingerSpread.png"));
+                            ImgCurPose.Source = bitmapImage;
                             break;
+
                         case Pose.DoubleTap:
+                            bitmapImage = new BitmapImage(new Uri("ms-appx://GUI_Ev3_Myo_Robot/Assets/Pinch.png"));
+                            ImgCurPose.Source = bitmapImage;
                             break;
+
                         case Pose.Unknown:
                             break;
                         default:

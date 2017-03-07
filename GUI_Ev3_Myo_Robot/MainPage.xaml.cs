@@ -5,16 +5,9 @@ using MyoSharp.Device;
 using MyoSharp.Exceptions;
 using MyoSharp.Poses;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using Windows.ApplicationModel.Core;
 using Windows.Networking;
-using Windows.Networking.Connectivity;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
@@ -35,24 +28,23 @@ namespace GUI_Ev3_Myo_Robot
     {
         //Ev3 Vars
         private Brick _brick;
-        private float _DirectionValue;
 
         //Booleans to check if Connected/Running
         private Boolean _IsRobotRunning = false;
-        private Boolean _IsRobotConnected = false;
 
         //Port etc To listen on for Ev3 Broadcast
-        private string _Ev3Port = "3015";
-        private uint _Ev3InboundBufferSize = 67;
+        private const string _EV3_PORT = "3015";
+        private const uint _EV3_INBOUND_BUFFER_SIZE = 67;
         private HostName _Ev3IpAddress;
 
         //Used only for starting program
-        private int count = 0;
+        private int _CountStartUp = 0;
 
         //Myo Vars
-        private IChannel _myoChannel;
-        private IHub _myoHub;
-        private Pose _currentPose;
+        private IChannel _MyoChannel;
+        private IHub _MyoHub;
+        private Pose _CurrentPose;
+        private IMyo _MyMyo;
 
         public MainPage()
         {
@@ -64,18 +56,18 @@ namespace GUI_Ev3_Myo_Robot
         { // communication, device, exceptions, poses
 
             // Create the channel
-            _myoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
+            _MyoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
                                     MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
 
             // Create the hub with the channel
-            _myoHub = MyoSharp.Device.Hub.Create(_myoChannel);
+            _MyoHub = MyoSharp.Device.Hub.Create(_MyoChannel);
 
             // Create the event handlers for connect and disconnect
-            _myoHub.MyoConnected += _myoHub_MyoConnected;
-            _myoHub.MyoDisconnected += _myoHub_MyoDisconnected;
+            _MyoHub.MyoConnected += _myoHub_MyoConnected;
+            _MyoHub.MyoDisconnected += _myoHub_MyoDisconnected;
 
             // Start listening 
-            _myoChannel.StartListening();
+            _MyoChannel.StartListening();
 
             //// Create the channel
             //_myoChannel1 = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
@@ -98,12 +90,13 @@ namespace GUI_Ev3_Myo_Robot
                 tblUpdates.Text = tblUpdates.Text + System.Environment.NewLine +
                                     "Myo disconnected";
             });
-            _myoHub.MyoConnected -= _myoHub_MyoConnected;
-            _myoHub.MyoDisconnected -= _myoHub_MyoDisconnected;
+            _MyoHub.MyoConnected -= _myoHub_MyoConnected;
+            _MyoHub.MyoDisconnected -= _myoHub_MyoDisconnected;
         }
 
         private async void _myoHub_MyoConnected(object sender, MyoEventArgs e)
         {
+            _MyMyo = e.Myo;
             e.Myo.Vibrate(VibrationType.Long);
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -114,10 +107,14 @@ namespace GUI_Ev3_Myo_Robot
 
             // unlock the Myo so that it doesn't keep locking between our poses
             e.Myo.Unlock(UnlockType.Hold);
+
+            //TbCurrentPose.Text = "Connecting to Robot Please Wait....";
+
+            FindHostIP();
         }
         #endregion
 
-        #region Auto Connect Ev3 to Wifi
+        #region Auto Connect Ev3 to Wifi - Needs Fixing
 
         private async void FindHostIP()
         {
@@ -127,16 +124,15 @@ namespace GUI_Ev3_Myo_Robot
             //Add MessageReceived Revived Event
             listener.MessageReceived += MessageReceived;
 
-            //Important for 
+            //Important for async access
             CoreApplication.Properties.Add("listener", listener);
 
             // Start listen operation.
             try
             {
-                listener.Control.InboundBufferSizeInBytes = _Ev3InboundBufferSize;
+                listener.Control.InboundBufferSizeInBytes = _EV3_INBOUND_BUFFER_SIZE;
                 // Don't limit traffic to an address or an adapter.
-                await listener.BindServiceNameAsync(_Ev3Port);
-                TbCurrentPose.Text = "Connecting to Robotm Please Wait....";
+                await listener.BindServiceNameAsync(_EV3_PORT);
             }
             catch (Exception)
             {
@@ -147,7 +143,6 @@ namespace GUI_Ev3_Myo_Robot
         //Event Fires Off when a message is recived on that Socket
         async void MessageReceived(DatagramSocket socket, DatagramSocketMessageReceivedEventArgs eventArguments)
         {
-
             //IF the Robot is not Connected, or maby Retry get connection to the robot 
             //Msg recived every 10 sec
             try
@@ -157,7 +152,7 @@ namespace GUI_Ev3_Myo_Robot
                     eventArguments.RemotePort);
                 _Ev3IpAddress = eventArguments.RemoteAddress;
 
-                _IsRobotConnected = true;
+                BrickInit();
             }
             catch (Exception)
             {
@@ -175,13 +170,13 @@ namespace GUI_Ev3_Myo_Robot
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 BitmapImage bitmapImage = null;
-                string imgPath = "ms - appx://GUI_Ev3_Myo_Robot/Assets/";
+                string imgPath = "ms-appx://GUI_Ev3_Myo_Robot/Assets/";
 
                 //Displays the Current Pose To the Screen
                 tblUpdates.Text = curr.ToString();
 
                 //Sets the _currentPose to the current pose
-                _currentPose = curr;
+                _CurrentPose = curr;
 
                 //Initilize the Robot
                 if (curr == Pose.FingersSpread)
@@ -234,8 +229,10 @@ namespace GUI_Ev3_Myo_Robot
         #region Brick Setup
         private void BrickInit()
         {
-            TbCurrentPose.Text += "\n Magic Fingers";
-            if (_IsRobotRunning == false && _IsRobotConnected == true)
+            //TbCurrentPose.Text += "\n Magic Fingers";
+
+            //if (_IsRobotRunning == false && _IsRobotConnected == true)
+            if (_IsRobotRunning == false && _CountStartUp == 0)
             {
                 _brick = new Brick(new NetworkCommunication(_Ev3IpAddress.CanonicalName));
 
@@ -243,7 +240,7 @@ namespace GUI_Ev3_Myo_Robot
 
                 connectToBrick();//Connects to the brick
 
-                count++;
+                _CountStartUp++;
             }
         }
 
@@ -252,13 +249,13 @@ namespace GUI_Ev3_Myo_Robot
         {
             await _brick.ConnectAsync();
 
-            await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
+            // await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
 
             //Return True when connected
             _IsRobotRunning = true;
 
             //Set The Bricks Motor Polarity
-            MotorPolarity();
+            //MotorPolarity();
         }
         #endregion
 
@@ -317,10 +314,24 @@ namespace GUI_Ev3_Myo_Robot
         //Event Fired when the brick changes
         private void _brick_BrickChanged(object sender, BrickChangedEventArgs e)
         {
-            Debug.WriteLine("Port A Results: " + e.Ports[InputPort.Four].PercentValue);
+            Debug.WriteLine("Port One Results: " + e.Ports[InputPort.One].RawValue);
+            float portOneValue = e.Ports[InputPort.One].SIValue;
 
-            //Maby get the value from Port 4(eyes) and stop it from crashing into walls
-            _DirectionValue = e.Ports[InputPort.Four].PercentValue;
+            //Update the Ui With the Value
+            UpdateUi(portOneValue.ToString());
+            CheckForCollision(portOneValue);
+        }
+
+        //Check Port One's Sensor SIValue for the distance between it any Object infront of it
+        //If there is a collision, alert the user via the Myo Armband 
+        private void CheckForCollision(float portOneValue)
+        {
+            if (portOneValue <= 40)
+                _MyMyo.Vibrate(VibrationType.Short);
+            else if (portOneValue <= 25)
+                _MyMyo.Vibrate(VibrationType.Medium);
+            else if (portOneValue <= 10)
+                _MyMyo.Vibrate(VibrationType.Long);
         }
 
         //Button Event to call shutBrickDown();
@@ -333,11 +344,11 @@ namespace GUI_Ev3_Myo_Robot
         private async void DisconnectFromBrick()
         {
             await _brick.DirectCommand.StopMotorAsync(OutputPort.All, true);
-            await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
+            //await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
 
             _brick.Disconnect();
-            _IsRobotConnected = false;
             _IsRobotRunning = false;
+            _CountStartUp = 0;
         }
 
         //Set Up motor Polarity
@@ -346,6 +357,19 @@ namespace GUI_Ev3_Myo_Robot
             await _brick.DirectCommand.SetMotorPolarity(OutputPort.C | OutputPort.D, Polarity.Forward);
         }
 
+        #endregion
+
+        #region Update Ui Asyncronosly
+        //Allows the update Of the UI from different Threads Asyncronosly
+        private async void UpdateUi(string message)
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                tbRawValue.Text = message;
+            }
+            );
+        }
         #endregion
 
 

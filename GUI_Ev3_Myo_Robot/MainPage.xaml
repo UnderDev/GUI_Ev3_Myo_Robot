@@ -37,10 +37,11 @@
 
             <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="7" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Visible">
                 <Image x:Name="image"  Source="Assets/MYO Command Instructons.png" Stretch="UniformToFill"/>
+                <TextBlock x:Name="tbRawValue" Text="Raw" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
             </StackPanel>
 
             <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="40,0" HorizontalAlignment="Center">
-                <TextBlock x:Name="tblUpdates" Text="Current Pose" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
+                <TextBlock x:Name="tblUpdates"  TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
                 <Image x:Name="ImgCurPose"  Width="102" Height="85"  />
             </StackPanel>
 

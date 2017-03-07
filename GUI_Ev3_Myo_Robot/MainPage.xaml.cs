@@ -35,7 +35,6 @@ namespace GUI_Ev3_Myo_Robot
         //Port etc To listen on for Ev3 Broadcast
         private const string _EV3_PORT = "3015";
         private const uint _EV3_INBOUND_BUFFER_SIZE = 67;
-        private HostName _Ev3IpAddress;
 
         //Used only for starting program
         private int _CountStartUp = 0;
@@ -150,9 +149,8 @@ namespace GUI_Ev3_Myo_Robot
                 IOutputStream outputStream = await socket.GetOutputStreamAsync(
                     eventArguments.RemoteAddress,
                     eventArguments.RemotePort);
-                _Ev3IpAddress = eventArguments.RemoteAddress;
 
-                BrickInit();
+                BrickInit(eventArguments.RemoteAddress);
             }
             catch (Exception)
             {
@@ -227,14 +225,14 @@ namespace GUI_Ev3_Myo_Robot
         #endregion
 
         #region Brick Setup
-        private void BrickInit()
+        private void BrickInit(HostName RemoteAddress)
         {
             //TbCurrentPose.Text += "\n Magic Fingers";
 
             //if (_IsRobotRunning == false && _IsRobotConnected == true)
             if (_IsRobotRunning == false && _CountStartUp == 0)
             {
-                _brick = new Brick(new NetworkCommunication(_Ev3IpAddress.CanonicalName));
+                _brick = new Brick(new NetworkCommunication(RemoteAddress.CanonicalName));
 
                 _brick.BrickChanged += _brick_BrickChanged;
 

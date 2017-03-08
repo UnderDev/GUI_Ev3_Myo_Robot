@@ -112,6 +112,8 @@
     <Content Include="Assets\Fist.png" />
     <Content Include="Assets\MYO Command Instructons.png" />
     <Content Include="Assets\Pinch.png" />
+    <Content Include="Assets\Rest.png" />
+    <Content Include="Assets\Unknown.png" />
     <Content Include="Assets\WaveIn.png" />
     <Content Include="Assets\WaveOut.png" />
     <Content Include="Assets\BackGroundImage.jpg" />

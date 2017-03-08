@@ -37,16 +37,19 @@
 
             <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="7" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Visible">
                 <Image x:Name="image"  Source="Assets/MYO Command Instructons.png" Stretch="UniformToFill"/>
-                <TextBlock x:Name="tbRawValue" Text="Raw" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
+                <TextBlock x:Name="tblUpdates" Text="Raw" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
             </StackPanel>
 
-            <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="40,0" HorizontalAlignment="Center">
-                <TextBlock x:Name="tblUpdates"  TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
-                <Image x:Name="ImgCurPose"  Width="102" Height="85"  />
+            <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Grid.RowSpan="2"  HorizontalAlignment="Center">
+                <Image x:Name="ImgCurPose"  Width="100" Height="90"  />
             </StackPanel>
 
 
             <StackPanel Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="5" Grid.RowSpan="3" HorizontalAlignment="Center">
+                <!--Camera preview-->
+                <CaptureElement Name="PreviewControl" Stretch="Fill" Height="200" />
+
+                <!--Commands As Text-->
                 <ScrollViewer  VerticalScrollMode="Enabled" >
                     <TextBlock x:Name="TbCurrentPose" TextWrapping="Wrap"  ScrollViewer.HorizontalScrollBarVisibility="Disabled"  Text="" ScrollViewer.VerticalScrollMode="Enabled" 
                                VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Foreground="White" FontFamily="Baskerville Old Face" FontStyle="Italic" TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Auto" />

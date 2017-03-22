@@ -26,7 +26,7 @@ using Windows.Media.Capture;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.UI.Xaml.Navigation;
-
+using System.Collections.Generic;
 
 namespace GUI_Ev3_Myo_Robot
 {
@@ -42,15 +42,13 @@ namespace GUI_Ev3_Myo_Robot
         private const string _EV3_PORT = "3015";
         private const uint _EV3_INBOUND_BUFFER_SIZE = 67;
 
-        //Used only for starting program
-        private int _CountStartUp = 0;
-
         //Myo Vars
         private IChannel _MyoChannel;
         private IHub _MyoHub;
         private Pose _CurrentPose;
         private IMyo _MyMyo;
 
+        Dictionary<Pose, Boolean> _checkPose = new Dictionary<Pose, Boolean>();
 
         //Camera Stuff
         // Prevent the screen from sleeping while the camera is running
@@ -68,28 +66,11 @@ namespace GUI_Ev3_Myo_Robot
         {
             this.InitializeComponent();
             NavigationCacheMode = NavigationCacheMode.Required;
+            _checkPose.Add(Pose.DoubleTap, false);
         }
 
 
         #region Myo Setup Methods
-        private void btnMyo_Click(object sender, RoutedEventArgs e)
-        { // communication, device, exceptions, poses
-
-            // Create the channel
-            _MyoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
-                                    MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
-
-            // Create the hub with the channel
-            _MyoHub = MyoSharp.Device.Hub.Create(_MyoChannel);
-
-            // Create the event handlers for connect and disconnect
-            _MyoHub.MyoConnected += _myoHub_MyoConnected;
-            _MyoHub.MyoDisconnected += _myoHub_MyoDisconnected;
-
-            // Start listening 
-            _MyoChannel.StartListening();
-        }
-
         private void _myoHub_MyoDisconnected(object sender, MyoEventArgs e)
         {
             UpdateUi("Myo disconnected");
@@ -116,14 +97,14 @@ namespace GUI_Ev3_Myo_Robot
         }
         #endregion
 
-        #region Auto Connect Ev3 to Wifi - Needs Fixing as performs this every 10 seconds
+        #region Auto Connect Ev3 to Wifi
 
         private async void FindHostIP()
         {
             //Open up a socket
             DatagramSocket listener = new DatagramSocket();
 
-            //Add MessageReceived Revived Event
+            //Add MessageReceived Event
             listener.MessageReceived += MessageReceived;
 
             //Important for async access
@@ -134,33 +115,38 @@ namespace GUI_Ev3_Myo_Robot
             {
                 UpdateUi("Finding Ev3 IP Address.. Please Wait");
                 listener.Control.InboundBufferSizeInBytes = _EV3_INBOUND_BUFFER_SIZE;
-                // Don't limit traffic to an address or an adapter.
+
+                //Await Message               
                 await listener.BindServiceNameAsync(_EV3_PORT);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //Oops Something Went Wong
+                UpdateUi(" Connection Error " + e.Message);
             }
         }
 
-        //Event Fires Off when a message is recived on that Socket
+        //Event Fires Off when a message is received on that Socket
         private async void MessageReceived(DatagramSocket socket, DatagramSocketMessageReceivedEventArgs eventArguments)
         {
-            //IF the Robot is not Connected, or maby Retry get connection to the robot 
+            //IF Robot is not Running
             //Msg recived every 10 sec
-            try
+            if (!_IsRobotRunning)
             {
-                IOutputStream outputStream = await socket.GetOutputStreamAsync(
-                    eventArguments.RemoteAddress,
-                    eventArguments.RemotePort);
+                try
+                {
+                    IOutputStream outputStream = await socket.GetOutputStreamAsync(
+                        eventArguments.RemoteAddress,
+                        eventArguments.RemotePort);
 
-                UpdateUi("Found Ev3! Trying To Conecting!");
+                    UpdateUi("Found Ev3! Attempting To Connect!");
 
-                BrickInit(eventArguments.RemoteAddress);
-            }
-            catch (Exception)
-            {
-                //Oops Something Went Wong
+                    //Pass the Remote IP address into the brick init method to get a connection
+                    BrickInit(eventArguments.RemoteAddress);
+                }
+                catch (Exception)
+                {
+                    UpdateUi("Oops Something Went Wrong \nCouldnt Connect to the Ev3 Brick");
+                }
             }
         }
 
@@ -183,10 +169,6 @@ namespace GUI_Ev3_Myo_Robot
 
                 //Sets the _currentPose to the current pose
                 _CurrentPose = curPose;
-
-                //Initilize the Robot
-                //if (curr == Pose.FingersSpread)
-                    //BrickInit();
 
                 if (_IsRobotRunning)
                 {
@@ -218,7 +200,17 @@ namespace GUI_Ev3_Myo_Robot
                             break;
 
                         case Pose.DoubleTap:
-                            RobotLift();
+                            if (_checkPose[Pose.DoubleTap] == false)
+                            {
+                                RobotLift();
+                                _checkPose[Pose.DoubleTap] = true;
+                            }
+                            else
+                            {
+                                RobotDrop();
+                                _checkPose[Pose.DoubleTap] = false;
+                            }
+
                             bitmapImage = new BitmapImage(new Uri(imgPath + "Pinch.png"));
                             break;
 
@@ -230,36 +222,31 @@ namespace GUI_Ev3_Myo_Robot
                 }
             });
         }
+
         #endregion
 
         #region Brick Setup
         private void BrickInit(HostName RemoteAddress)
         {
-            //if (_IsRobotRunning == false && _IsRobotConnected == true)
-            if (_IsRobotRunning == false && _CountStartUp == 0)
-            {
-                _brick = new Brick(new NetworkCommunication(RemoteAddress.CanonicalName));
+            _brick = new Brick(new NetworkCommunication(RemoteAddress.CanonicalName));
 
-                _brick.BrickChanged += _brick_BrickChanged;
+            _brick.BrickChanged += _brick_BrickChanged;
 
-                connectToBrick(RemoteAddress.CanonicalName);//Connects to the brick
-
-                _CountStartUp++;
-            }
+            connectToBrick(RemoteAddress.CanonicalName);//Connects to the brick
         }
 
-        //Connect to the Lego Brick
+        //Connect to the Lego Brick At the passed in IP address
         private async void connectToBrick(String hostIp)
         {
             await _brick.ConnectAsync();
-            UpdateUi("Connected To Ev3 At Address: "+ hostIp);
-            // await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
+            UpdateUi("Connected To Ev3 At Address: " + hostIp);
+            await _brick.DirectCommand.PlayToneAsync(10, 2000, 3000);
 
             //Return True when connected
             _IsRobotRunning = true;
 
             //Set The Bricks Motor Polarity
-            //MotorPolarity();
+            MotorPolarity();
         }
         #endregion
 
@@ -289,70 +276,110 @@ namespace GUI_Ev3_Myo_Robot
         //Move Robot Right - Wave Out
         private async void RobotRight()
         {
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D, 100);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.C, 70);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.C, 100);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D, 55);
 
             TbCurrentPose.Text += "\n RobotRight()  Pose.WaveOut";
         }
 
-        //Move Robot Right - Wave In
+        //Move Robot Left - Wave In
         private async void RobotLeft()
         {
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D, 70);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.C, 100);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.C, 55);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D, 100);
 
             TbCurrentPose.Text += "\n RobotLeft()  Pose.WaveIn";
         }
 
-        //Move Robot Lift - Wave In
+        //Robot Lift - Pinch
         private async void RobotLift()
         {
-            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.B, -30, 1300, true);
+            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.B, -48, 2000, true);
 
             TbCurrentPose.Text += "\n RobotLift()  Pose.Pinch";
         }
 
+        //Robot Drop - Pinch
+        private async void RobotDrop()
+        {
+            await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.B, 35, 1900, true);
+            TbCurrentPose.Text += "\n RobotDrop()  Pose.Pinch";
+        }
+
         #endregion
 
-        #region Robot Event Methods
-        //Event Fired when the brick changes
-        private void _brick_BrickChanged(object sender, BrickChangedEventArgs e)
-        {
-            Debug.WriteLine("Port One Results: " + e.Ports[InputPort.One].RawValue);
-            float portOneValue = e.Ports[InputPort.One].SIValue;
+        #region Connection/Disconnection Events
+       
+        //Button Event that calls all necessary methods to connect to everything
+        private void btnConnect_Click(object sender, RoutedEventArgs e)
+        { // communication, device, exceptions, poses
 
-            //Update the Ui With the Value
-            UpdateUi(portOneValue.ToString());
-            CheckForCollision(portOneValue);
+            // Create the channel
+            _MyoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
+                                    MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
+
+            // Create the hub with the channel
+            _MyoHub = MyoSharp.Device.Hub.Create(_MyoChannel);
+
+            // Create the event handlers for connect and disconnect
+            _MyoHub.MyoConnected += _myoHub_MyoConnected;
+            _MyoHub.MyoDisconnected += _myoHub_MyoDisconnected;
+
+            // Start listening 
+            _MyoChannel.StartListening();
         }
 
-        //Check Port One's Sensor SIValue for the distance between it any Object infront of it
-        //If there is a collision, alert the user via the Myo Armband 
-        private void CheckForCollision(float portOneValue)
-        {
-            if (portOneValue <= 40)
-                _MyMyo.Vibrate(VibrationType.Short);
-            else if (portOneValue <= 25)
-                _MyMyo.Vibrate(VibrationType.Medium);
-            else if (portOneValue <= 10)
-                _MyMyo.Vibrate(VibrationType.Long);
-        }
-
-        //Button Event to call shutBrickDown();
+        //Button Event that calls all necessary methods to Disconnect From everything
         private void Disconnect_Click(object sender, RoutedEventArgs e)
         {
             DisconnectFromBrick();
+        }
+        #endregion
+
+
+        #region Robot Event Methods
+
+        //Event Fired when the brick changes
+        private void _brick_BrickChanged(object sender, BrickChangedEventArgs e)
+        {
+            float portOneValue = e.Ports[InputPort.One].SIValue;
+            Debug.WriteLine("Port One Results: " + portOneValue);
+
+            //Update the Ui With the Ports Value
+            UpdateUi("Proximity: " + portOneValue.ToString());
+
+            CheckForCollision(portOneValue);
+        }
+
+        //Check Port One's Sensor SIValue for the distance between it and any Object infront of it.
+        //If there is a collision about to occure, alert the user with vibrations on the Myo Armband and sound on the EV3 Brick.
+        private async void CheckForCollision(float portOneValue)
+        {
+            if (portOneValue <= 45)
+            {
+                _MyMyo.Vibrate(VibrationType.Short);
+                await _brick.DirectCommand.PlayToneAsync(5, 2000, 1000);
+            }
+            else if (portOneValue <= 35)
+            {
+                _MyMyo.Vibrate(VibrationType.Medium);
+                await _brick.DirectCommand.PlayToneAsync(5, 3000, 2000);
+            }
+            else if (portOneValue <= 10)
+            {
+                _MyMyo.Vibrate(VibrationType.Long);
+                await _brick.DirectCommand.PlayToneAsync(5, 4000, 3000);
+            }
         }
 
         //Method Shuts Down The Brick And Stops All Motors
         private async void DisconnectFromBrick()
         {
             await _brick.DirectCommand.StopMotorAsync(OutputPort.All, true);
-            //await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
+            await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
 
             _brick.Disconnect();
             _IsRobotRunning = false;
-            _CountStartUp = 0;
         }
 
         //Set Up motor Polarity
@@ -377,30 +404,23 @@ namespace GUI_Ev3_Myo_Robot
         #endregion
 
 
-
-
-        #region Constructor, lifecycle and navigation
+        #region Constructor, Lifecycle and Navigation
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             await InitializeCameraAsync();
         }
-        #endregion Constructor, lifecycle and navigation
+        #endregion 
 
         #region MediaCapture methods
 
-        /// <summary>
-        /// Initializes the MediaCapture, registers events, gets camera device information for mirroring and rotating, and starts preview
-        /// </summary>
-        /// <returns></returns>
+        // Initializes the MediaCapture, registers events, gets camera device and starts preview
         private async Task InitializeCameraAsync()
         {
-            Debug.WriteLine("InitializeCameraAsync");
-
             if (_mediaCapture == null)
             {
                 UpdateUi("Finding Camera");
-                // Attempt to get the back camera if one is available, but use any camera device if not
-                var cameraDevice = await FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel.Top);
+                // Attempt to get the Front camera if one is available, but use any camera device if not
+                var cameraDevice = await FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel.Front);
 
                 if (cameraDevice == null)
                 {
@@ -410,7 +430,6 @@ namespace GUI_Ev3_Myo_Robot
 
                 // Create MediaCapture and its settings
                 _mediaCapture = new MediaCapture();
-
                 var settings = new MediaCaptureInitializationSettings { VideoDeviceId = cameraDevice.Id };
 
                 // Initialize MediaCapture
@@ -432,10 +451,8 @@ namespace GUI_Ev3_Myo_Robot
             }
         }
 
-        /// <summary>
-        /// Starts the preview and adjusts it for for rotation and mirroring after making a request to keep the screen on and unlocks the UI
-        /// </summary>
-        /// <returns></returns>
+
+        //Starts the preview and adjusts it for for rotation and mirroring after making a request to keep the screen on and unlocks the UI
         private async Task StartPreviewAsync()
         {
             UpdateUi("Starting Camera Preview");
@@ -450,16 +467,12 @@ namespace GUI_Ev3_Myo_Robot
             await _mediaCapture.StartPreviewAsync();
         }
 
-        #endregion MediaCapture methods
+        #endregion
 
         #region Helper functions
 
-        /// <summary>
-        /// Queries the available video capture devices to try and find one mounted on the desired panel
-        /// </summary>
-        /// <param name="desiredPanel">The panel on the device that the desired camera is mounted on</param>
-        /// <returns>A DeviceInformation instance with a reference to the camera mounted on the desired panel if available,
-        ///          any other camera if not, or null if no camera is available.</returns>
+        // Queries the available video capture devices to try and find one mounted on the desired panel.
+        // DesiredPanel is the panel on the device that the desired camera is mounted on.
         private static async Task<DeviceInformation> FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel desiredPanel)
         {
             // Get available devices for capturing pictures
@@ -469,15 +482,13 @@ namespace GUI_Ev3_Myo_Robot
             DeviceInformation desiredDevice = allVideoDevices.FirstOrDefault(x => x.EnclosureLocation != null && x.EnclosureLocation.Panel == desiredPanel);
 
             // If there is no device mounted on the desired panel, return the first device found
+            // If whatever is to the left is not null, use that, otherwise use what's to the right.
+            // Ternary style
             return desiredDevice ?? allVideoDevices.FirstOrDefault();
         }
 
-        /// <summary>
-        /// Saves a SoftwareBitmap to the specified StorageFile
-        /// </summary>
-        /// <param name="bitmap">SoftwareBitmap to save</param>
-        /// <param name="file">Target StorageFile to save to</param>
-        /// <returns></returns>
+
+        // Saves a SoftwareBitmap to the specified StorageFile
         private static async Task SaveSoftwareBitmapAsync(SoftwareBitmap bitmap, StorageFile file)
         {
             using (var outputStream = await file.OpenAsync(FileAccessMode.ReadWrite))
@@ -491,8 +502,5 @@ namespace GUI_Ev3_Myo_Robot
         }
 
         #endregion Helper functions 
-
-
-
     }
 }

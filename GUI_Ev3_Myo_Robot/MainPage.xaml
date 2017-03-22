@@ -56,49 +56,14 @@
                 </ScrollViewer>
             </StackPanel>
 
-
             <StackPanel Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="5" Grid.RowSpan="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button x:Name="btnMyo" Content="Find Myo" HorizontalAlignment="Center" 
-                VerticalAlignment="Center" Click="btnMyo_Click" Margin="0,0,50,0" Foreground="White" BorderBrush="White"/>
+                <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Center" 
+                VerticalAlignment="Center" Click="btnConnect_Click" Margin="0,0,50,0" Foreground="White" BorderBrush="White"/>
 
-                <Button x:Name="Disconnect" Content="Stop EV3" HorizontalAlignment="Center" 
+                <Button x:Name="Disconnect" Content="Dissconnect" HorizontalAlignment="Center" 
                 VerticalAlignment="Center" Click="Disconnect_Click" Foreground="White" BorderBrush="White" />
             </StackPanel>
 
-
-
-
-
-
-            <!-- <StackPanel Orientation="Horizontal" Margin="10,50, 0,0" HorizontalAlignment="Left" >
-            <TextBlock x:Name="tblXValue" Text="x: " Margin="5" Foreground="Red" FontSize="28"/>
-            <TextBlock x:Name="tblYValue" Text="x: " Margin="5" Foreground="Green" FontSize="28"/>
-            <TextBlock x:Name="tblZValue" Text="x: " Margin="5" Foreground="Blue" FontSize="28"/>
-            <TextBlock x:Name="tbHeight" Text="y: " Margin="5" Foreground="Blue" FontSize="28"/>
-        </StackPanel>
-
-
-        <Canvas x:Name="cvsLines" Visibility="Collapsed"  >
-            <Line x:Name="pitchLine" X1="200" Y1="350" X2="200" Y2="350" Stroke="Red" StrokeThickness="4" />
-            <Line x:Name="yawLine" X1="200" Y1="350" X2="200" Y2="350" Stroke="Green" StrokeThickness="4" />
-            <Line x:Name="rollLine" X1="200" Y1="350" X2="200" Y2="350" Stroke="Blue" StrokeThickness="4" />
-        </Canvas>
-
-        <StackPanel Orientation="Horizontal" Margin="0,500, 0,0" HorizontalAlignment="Center" >
-            <TextBlock x:Name="tblXGyro" Text="x: " Margin="5" Foreground="Red" FontSize="28"/>
-            <TextBlock x:Name="tblYGyro" Text="x: " Margin="5" Foreground="Green" FontSize="28"/>
-            <TextBlock x:Name="tblZGyro" Text="x: " Margin="5" Foreground="Blue" FontSize="28"/>
-        </StackPanel>
-
-        <Button x:Name="btnMyo" Content="Find Myo" HorizontalAlignment="Center" Margin="70,0,207,24"
-                VerticalAlignment="Bottom" Click="btnMyo_Click"/>
-
-        <Button x:Name="Disconnect" Content="Stop EV3" HorizontalAlignment="Center" Margin="222,0,59,25"
-                VerticalAlignment="Bottom" Click="Disconnect_Click" />
-
-        <ScrollViewer Margin="0,130,0,62" VerticalScrollMode="Enabled" >
-            <TextBlock x:Name="TbCurrentPose" HorizontalAlignment="Left" TextWrapping="Wrap"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled" VerticalAlignment="Top" Width="250"/>
-        </ScrollViewer>-->
         </Grid>
     </Grid>
 </Page>

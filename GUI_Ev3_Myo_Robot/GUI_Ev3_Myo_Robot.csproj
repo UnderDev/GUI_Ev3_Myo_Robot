@@ -143,6 +143,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="MyoSharp">
       <HintPath>bin\MyoSharp.dll</HintPath>
     </Reference>

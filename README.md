@@ -15,20 +15,28 @@
        | |   | ||  __)   (_____  )   | |   |     __)| |   | |  \   /  |  __)   |     __)
        | |   ) || (            ) |   | |   | (\ (   | |   | |   ) (   | (      | (\ (   
        | (__/  )| (____/\/\____) |   | |   | ) \ \__| (___) |   | |   | (____/\| ) \ \__
-       (______/ (_______/\_______)   )_(   |/   \__/(_______)   \_/   (_______/|/   \__/
-                                                                                                                                                             |___/                                                                              |___/                                                                       |___/                                                                                                        \/__/                                                                                           (____/                                                                                                /____/                                                                                                                                               
+       (______/ (_______/\_______)   )_(   |/   \__/(_______)   \_/   (_______/|/   \__/                                                                                                                                              
  ```
  
 ### Introduction
 
 The idea for this project was to build a [ Lego Mindstorms Ev3](https://www.lego.com/en-us/mindstorms) Robot, that I can Control Via the [MYO Armband](https://www.myo.com/) using different hand gestures.  
 
-The project will be built using UWP and will hopefully be deployed onto a Raspberry Pi 2 running Windows IOT Core. 
+The project will be built using UWP. 
 
 Having the App running on a raspberry pi, makes the project more portable, not needing to carry around a laptop everywhere you go just to control/connect the Robot.
 
+### Required Hardware
+  * Lego Ev3 Mindstorms
+  * Myo Armband
+  * Bluetooth Dongle
 
-###Gestures(Controls) Used:
+### Features
+ * Automatically Connects to Myo Armband Via bluetooth
+ * Automatically Connects to Lego Brick via Wifi
+ * Webcam Streaming To the App
+
+### Gestures(Controls) Used:
 Controls for the Robot were as Follows:
  * Move Robot Forward - Fist Gesture.
  * Move Robot Backwards – Finger Spread.
@@ -43,7 +51,6 @@ Controls for the Robot were as Follows:
 
 [MyoSharp](https://github.com/tayfuzun/MyoSharp) Wrapper to connecting UWP to The Myo Armband.
   
-### The Robot Used
 
   
   

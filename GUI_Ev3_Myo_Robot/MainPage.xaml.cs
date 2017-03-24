@@ -34,6 +34,7 @@ namespace GUI_Ev3_Myo_Robot
     {
         //Ev3 Vars
         private Brick _brick;
+        DatagramSocket _listener;
 
         //Booleans to check if Connected/Running
         private Boolean _IsRobotRunning = false;
@@ -48,7 +49,7 @@ namespace GUI_Ev3_Myo_Robot
         private Pose _CurrentPose;
         private IMyo _MyMyo;
 
-        Dictionary<Pose, Boolean> _checkPose = new Dictionary<Pose, Boolean>();
+        private Dictionary<Pose, Boolean> _checkPose = new Dictionary<Pose, Boolean>();
 
         //Camera Stuff
         // Prevent the screen from sleeping while the camera is running
@@ -102,22 +103,22 @@ namespace GUI_Ev3_Myo_Robot
         private async void FindHostIP()
         {
             //Open up a socket
-            DatagramSocket listener = new DatagramSocket();
+            _listener = new DatagramSocket();
 
             //Add MessageReceived Event
-            listener.MessageReceived += MessageReceived;
+            _listener.MessageReceived += MessageReceived;
 
             //Important for async access
-            CoreApplication.Properties.Add("listener", listener);
+            CoreApplication.Properties.Add("listener", _listener);
 
             // Start listen operation.
             try
             {
                 UpdateUi("Finding Ev3 IP Address.. Please Wait");
-                listener.Control.InboundBufferSizeInBytes = _EV3_INBOUND_BUFFER_SIZE;
+                _listener.Control.InboundBufferSizeInBytes = _EV3_INBOUND_BUFFER_SIZE;
 
                 //Await Message               
-                await listener.BindServiceNameAsync(_EV3_PORT);
+                await _listener.BindServiceNameAsync(_EV3_PORT);
             }
             catch (Exception e)
             {
@@ -256,39 +257,39 @@ namespace GUI_Ev3_Myo_Robot
         private async void RobotFoward()
         {
             await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D | OutputPort.C, 100);
-            TbCurrentPose.Text += "\n RobotFoward() Pose.Fist";
+            TbCurrentPose.Text += "\n RobotFoward";
         }
 
         //Stop All The Motors - Rest
         private async void RobotStop()
         {
             await _brick.DirectCommand.StopMotorAsync(OutputPort.All, true);
-            TbCurrentPose.Text += "\n RobotFoward() Pose.Fist";
+            TbCurrentPose.Text = "\n RobotStoped";
         }
 
         //Move Robot Backwards - FingerSpread
         private async void RobotBackward()
         {
             await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D | OutputPort.C, -100);
-            TbCurrentPose.Text += "\n RobotBackward()  Pose.Fist";
+            TbCurrentPose.Text = "\n RobotBackward";
         }
 
         //Move Robot Right - Wave Out
         private async void RobotRight()
         {
             await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.C, 100);
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D, 55);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D, -55);
 
-            TbCurrentPose.Text += "\n RobotRight()  Pose.WaveOut";
+            TbCurrentPose.Text = "\n RobotRight";
         }
 
         //Move Robot Left - Wave In
         private async void RobotLeft()
         {
-            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.C, 55);
+            await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.C, -55);
             await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D, 100);
 
-            TbCurrentPose.Text += "\n RobotLeft()  Pose.WaveIn";
+            TbCurrentPose.Text = "\n RobotLeft";
         }
 
         //Robot Lift - Pinch
@@ -296,14 +297,14 @@ namespace GUI_Ev3_Myo_Robot
         {
             await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.B, -48, 2000, true);
 
-            TbCurrentPose.Text += "\n RobotLift()  Pose.Pinch";
+            TbCurrentPose.Text = "\n RobotLift";
         }
 
         //Robot Drop - Pinch
         private async void RobotDrop()
         {
             await _brick.DirectCommand.TurnMotorAtPowerForTimeAsync(OutputPort.B, 35, 1900, true);
-            TbCurrentPose.Text += "\n RobotDrop()  Pose.Pinch";
+            TbCurrentPose.Text = "\n RobotDrop";
         }
 
         #endregion
@@ -313,7 +314,8 @@ namespace GUI_Ev3_Myo_Robot
         //Button Event that calls all necessary methods to connect to everything
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         { // communication, device, exceptions, poses
-
+            Disconnect.Visibility = Visibility.Visible;
+            btnConnect.Visibility = Visibility.Collapsed;
             // Create the channel
             _MyoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
                                     MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
@@ -332,7 +334,17 @@ namespace GUI_Ev3_Myo_Robot
         //Button Event that calls all necessary methods to Disconnect From everything
         private void Disconnect_Click(object sender, RoutedEventArgs e)
         {
-            DisconnectFromBrick();
+                btnConnect.Visibility = Visibility.Visible;
+                Disconnect.Visibility = Visibility.Collapsed;
+                DisconnectFromBrick();
+                _MyoHub.MyoDisconnected -= _myoHub_MyoDisconnected;
+                _MyoHub.MyoConnected -= _myoHub_MyoConnected;
+                _listener.MessageReceived -= MessageReceived;
+                _listener.Dispose();
+
+                //Remove Key
+                CoreApplication.Properties.Remove("listener");
+
         }
         #endregion
 
@@ -363,23 +375,30 @@ namespace GUI_Ev3_Myo_Robot
             else if (portOneValue <= 35)
             {
                 _MyMyo.Vibrate(VibrationType.Medium);
-                await _brick.DirectCommand.PlayToneAsync(5, 3000, 2000);
+                await _brick.DirectCommand.PlayToneAsync(10, 3000, 2000);
             }
             else if (portOneValue <= 10)
             {
                 _MyMyo.Vibrate(VibrationType.Long);
-                await _brick.DirectCommand.PlayToneAsync(5, 4000, 3000);
+                await _brick.DirectCommand.PlayToneAsync(15, 4000, 3000);
             }
         }
 
         //Method Shuts Down The Brick And Stops All Motors
         private async void DisconnectFromBrick()
         {
+        try
+        {
             await _brick.DirectCommand.StopMotorAsync(OutputPort.All, true);
             await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
 
             _brick.Disconnect();
             _IsRobotRunning = false;
+        }
+        catch (Exception)
+        {
+
+        }
         }
 
         //Set Up motor Polarity

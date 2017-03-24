@@ -40,8 +40,8 @@
                 <TextBlock x:Name="tblUpdates" Text="Raw" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
             </StackPanel>
 
-            <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Grid.RowSpan="2"  HorizontalAlignment="Center">
-                <Image x:Name="ImgCurPose"  Width="100" Height="90"  />
+            <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3" Grid.RowSpan="2"  HorizontalAlignment="Center">
+                <Image x:Name="ImgCurPose"  Width="125" Height="100"  />
             </StackPanel>
 
 
@@ -50,18 +50,16 @@
                 <CaptureElement Name="PreviewControl" Stretch="Fill" Height="200" />
 
                 <!--Commands As Text-->
-                <ScrollViewer  VerticalScrollMode="Enabled" >
-                    <TextBlock x:Name="TbCurrentPose" TextWrapping="Wrap"  ScrollViewer.HorizontalScrollBarVisibility="Disabled"  Text="" ScrollViewer.VerticalScrollMode="Enabled" 
-                               VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Foreground="White" FontFamily="Baskerville Old Face" FontStyle="Italic" TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-                </ScrollViewer>
+                <TextBlock x:Name="TbCurrentPose" TextWrapping="Wrap"  Text=""
+                               VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Foreground="White" FontFamily="Baskerville Old Face" FontStyle="Italic" TextAlignment="Center" FontSize="20"/>
             </StackPanel>
 
             <StackPanel Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="5" Grid.RowSpan="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Center" 
-                VerticalAlignment="Center" Click="btnConnect_Click" Margin="0,0,50,0" Foreground="White" BorderBrush="White"/>
+                VerticalAlignment="Center" Click="btnConnect_Click"  Foreground="White" BorderBrush="White"/>
 
                 <Button x:Name="Disconnect" Content="Dissconnect" HorizontalAlignment="Center" 
-                VerticalAlignment="Center" Click="Disconnect_Click" Foreground="White" BorderBrush="White" />
+                VerticalAlignment="Center" Click="Disconnect_Click" Foreground="White" BorderBrush="White" Visibility="Collapsed"/>
             </StackPanel>
 
         </Grid>

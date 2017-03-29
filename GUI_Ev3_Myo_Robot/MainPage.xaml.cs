@@ -37,7 +37,7 @@ namespace GUI_Ev3_Myo_Robot
         DatagramSocket _listener;
 
         //Booleans to check if Connected/Running
-        private Boolean _IsRobotRunning = false;
+        private bool _IsRobotRunning = false;
 
         //Port etc To listen on for Ev3 Broadcast
         private const string _EV3_PORT = "3015";
@@ -49,7 +49,7 @@ namespace GUI_Ev3_Myo_Robot
         private Pose _CurrentPose;
         private IMyo _MyMyo;
 
-        private Dictionary<Pose, Boolean> _checkPose = new Dictionary<Pose, Boolean>();
+        private Dictionary<Pose, bool> _checkPose = new Dictionary<Pose, bool>();
 
         //Camera Stuff
         // Prevent the screen from sleeping while the camera is running
@@ -310,15 +310,22 @@ namespace GUI_Ev3_Myo_Robot
         #endregion
 
         #region Connection/Disconnection Events
-       
+
         //Button Event that calls all necessary methods to connect to everything
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         { // communication, device, exceptions, poses
             Disconnect.Visibility = Visibility.Visible;
             btnConnect.Visibility = Visibility.Collapsed;
             // Create the channel
-            _MyoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
-                                    MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
+            try
+            {
+                _MyoChannel = Channel.Create(ChannelDriver.Create(ChannelBridge.Create(),
+                                            MyoErrorHandlerDriver.Create(MyoErrorHandlerBridge.Create())));
+            }
+            catch (Exception)
+            {
+                UpdateUi("Myo Connect Must Be Turned On");
+            }
 
             // Create the hub with the channel
             _MyoHub = MyoSharp.Device.Hub.Create(_MyoChannel);
@@ -334,6 +341,8 @@ namespace GUI_Ev3_Myo_Robot
         //Button Event that calls all necessary methods to Disconnect From everything
         private void Disconnect_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
                 btnConnect.Visibility = Visibility.Visible;
                 Disconnect.Visibility = Visibility.Collapsed;
                 DisconnectFromBrick();
@@ -344,10 +353,13 @@ namespace GUI_Ev3_Myo_Robot
 
                 //Remove Key
                 CoreApplication.Properties.Remove("listener");
+            }
+            catch (Exception)
+            {
+            }
 
         }
         #endregion
-
 
         #region Robot Event Methods
 
@@ -387,18 +399,18 @@ namespace GUI_Ev3_Myo_Robot
         //Method Shuts Down The Brick And Stops All Motors
         private async void DisconnectFromBrick()
         {
-        try
-        {
-            await _brick.DirectCommand.StopMotorAsync(OutputPort.All, true);
-            await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
+            try
+            {
+                await _brick.DirectCommand.StopMotorAsync(OutputPort.All, true);
+                await _brick.DirectCommand.PlayToneAsync(5, 2000, 3000);
 
-            _brick.Disconnect();
-            _IsRobotRunning = false;
-        }
-        catch (Exception)
-        {
+                _brick.Disconnect();
+                _IsRobotRunning = false;
+            }
+            catch (Exception)
+            {
 
-        }
+            }
         }
 
         //Set Up motor Polarity

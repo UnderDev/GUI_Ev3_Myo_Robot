@@ -24,18 +24,42 @@ The idea for this project was to build a [ Lego Mindstorms Ev3](https://www.lego
 
 The project will be built using UWP. 
 
-Having the App running on a raspberry pi, makes the project more portable, not needing to carry around a laptop everywhere you go just to control/connect the Robot.
-
 ### Required Hardware
   * Lego Ev3 Mindstorms
   * Myo Armband
   * Bluetooth Dongle
-
+  
 ### Features
  * Automatically Connects to Myo Armband Via bluetooth
  * Automatically Connects to Lego Brick via Wifi
  * Webcam Streaming To the App
+ 
+### Running the Project
+ To Run the project please follow the steps Below:
+ 
+ * Download the Source Code into Visual Studio 2015.
+ * Download [Myo Connect.](https://www.myo.com/start)
+ * Run Myo Connect and [Calibrate](https://support.getmyo.com/hc/en-us/articles/203829315-Creating-a-custom-calibration-profile-for-your-Myo-armband) Your Myo Armband.
+ * Connect Your Lego MindStorms Brick to Same [Wi-fi Connection](https://uk.mathworks.com/help/supportpkg/legomindstormsev3io/ug/connect-to-an-ev3-brick-over-wifi.html?requestedDomain=www.mathworks.com) as the App.
+ * Run the App on Visual Studio 2015 in Debug 86X on the local machine.
 
+### Ev3 Port's To Gesture
+These are the following Ports each Gesture Controls and there associated speeds:
+
+Motor Ports: A, B, C, D
+* Fist Gesture   - (Port D, Speed 100) and (Port C, Speed 100)
+* Finger Spread  - (Port D, Speed -100) and (Port C , Speed -100)
+* Wave In        - (Port D, Speed 100) and (Port C , Speed -55)
+* Wave Out       - (Port D, Speed -55) and (Port C , Speed 100)
+* Pinch          - (Port B, Speed -48)
+* Pinch (Again)  - (Port B, Speed 35)
+* Rest           - Stops all Motors in all ports
+
+Sensor Ports: 1, 2, 3, 4
+
+Only the IR sensor is used, and is connected to port one to grab the Sensors SIV value
+* Port One - Raw Value 
+ 
 ### Gestures(Controls) Used:
 Controls for the Robot were as Follows:
  * Move Robot Forward - Fist Gesture.

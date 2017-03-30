@@ -35,23 +35,22 @@
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="7" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Visible">
+            <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="7" Grid.RowSpan="4" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Visible">
                 <Image x:Name="image"  Source="Assets/MYO Command Instructons.png" Stretch="UniformToFill"/>
-                <TextBlock x:Name="tblUpdates" Text="Raw" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
-            </StackPanel>
-
-            <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3" Grid.RowSpan="2"  HorizontalAlignment="Center">
-                <Image x:Name="ImgCurPose"  Width="125" Height="100"  />
+                <TextBlock x:Name="tblUpdates" Text=""  HorizontalAlignment="Center" FontSize="30" VerticalAlignment="Center" FontFamily="Calisto MT" Foreground="White"  />
             </StackPanel>
 
 
-            <StackPanel Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="5" Grid.RowSpan="3" HorizontalAlignment="Center">
-                <!--Camera preview-->
-                <CaptureElement Name="PreviewControl" Stretch="Fill" Height="200" />
+            <StackPanel Grid.Column="3" Grid.Row="4" Grid.ColumnSpan="1" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!--Camera preview No Longer Used But Working-->
+                <!--<CaptureElement Name="PreviewControl" Stretch="Fill" Height="200" />-->
 
                 <!--Commands As Text-->
                 <TextBlock x:Name="TbCurrentPose" TextWrapping="Wrap"  Text=""
-                               VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Foreground="White" FontFamily="Baskerville Old Face" FontStyle="Italic" TextAlignment="Center" FontSize="20"/>
+                               VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Foreground="White" FontFamily="Baskerville Old Face" FontStyle="Italic" TextAlignment="Center" FontSize="15"/>
+
+
+                <Image x:Name="ImgCurPose"  Width="125" Height="100"  />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="5" Grid.RowSpan="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Center">

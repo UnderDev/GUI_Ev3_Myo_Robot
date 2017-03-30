@@ -51,22 +51,20 @@ namespace GUI_Ev3_Myo_Robot
 
         private Dictionary<Pose, bool> _checkPose = new Dictionary<Pose, bool>();
 
-        //Camera Stuff
-        // Prevent the screen from sleeping while the camera is running
-        private readonly DisplayRequest _displayRequest = new DisplayRequest();
-
-        // For listening to media property changes
-        private readonly SystemMediaTransportControls _systemMediaControls = SystemMediaTransportControls.GetForCurrentView();
-
-        // MediaCapture and its state variables
-        private MediaCapture _mediaCapture;
-        private bool _isInitialized = false;
-
+        #region Camera Vars, Not currently in use
+            private readonly DisplayRequest _displayRequest = new DisplayRequest();
+            // Used to listen to media property changes
+            private readonly SystemMediaTransportControls _systemMediaControls = SystemMediaTransportControls.GetForCurrentView();
+            // MediaCapture and its state variables
+            private MediaCapture _mediaCapture;
+            private bool _isInitialized = false;
+        #endregion 
 
         public MainPage()
         {
             this.InitializeComponent();
             NavigationCacheMode = NavigationCacheMode.Required;
+            //Only used for DoubleTap Reuse
             _checkPose.Add(Pose.DoubleTap, false);
         }
 
@@ -257,7 +255,7 @@ namespace GUI_Ev3_Myo_Robot
         private async void RobotFoward()
         {
             await _brick.DirectCommand.TurnMotorAtPowerAsync(OutputPort.D | OutputPort.C, 100);
-            TbCurrentPose.Text += "\n RobotFoward";
+            TbCurrentPose.Text = "\n RobotFoward";
         }
 
         //Stop All The Motors - Rest
@@ -435,10 +433,13 @@ namespace GUI_Ev3_Myo_Robot
         #endregion
 
 
+
+        #region Camera Methods etc, no longer need but still working
         #region Constructor, Lifecycle and Navigation
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            await InitializeCameraAsync();
+            //uncomment below to activate the camera, and uncomment CaptureElement in Xaml code
+            // await InitializeCameraAsync();
         }
         #endregion 
 
@@ -492,7 +493,7 @@ namespace GUI_Ev3_Myo_Robot
             _displayRequest.RequestActive();
 
             // Set the preview source in the UI and mirror it if necessary
-            PreviewControl.Source = _mediaCapture;
+            //PreviewControl.Source = _mediaCapture;
 
             // Start the preview
             await _mediaCapture.StartPreviewAsync();
@@ -533,5 +534,7 @@ namespace GUI_Ev3_Myo_Robot
         }
 
         #endregion Helper functions 
+
+        #endregion
     }
 }

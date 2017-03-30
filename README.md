@@ -19,11 +19,11 @@
  
 ### Introduction
 
-The idea for this project was to build a [ Lego Mindstorms Ev3](https://www.lego.com/en-us/mindstorms) Robot, that I can Control Via the [MYO Armband](https://www.myo.com/) using different hand gestures.
+The idea for this project was to build a [ Lego Mindstorms Ev3](https://www.lego.com/en-us/mindstorms) Robot, that I can Control Via the [MYO Armband](https://www.myo.com/) using different hand gestures. The project was built using UWP. 
 
 To add a bit more funstionalty to the Robot, i mounted my phone to the front of the robot which was running Skype, i then send a video request to another Skpe application running on my Laptop. From this, i was able to drive the robot around with a first person view of where i was going without keeping the robot in sight.
 
-The project will be built using UWP. 
+Robot Used Can Be Found [HERE](https://github.com/UnderDev/GUI_Ev3_Myo_Robot/blob/master/Robot.png)
 
 ### Required Hardware
   * Lego Ev3 Mindstorms

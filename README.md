@@ -44,32 +44,26 @@ Robot Used Can Be Found [HERE](https://github.com/UnderDev/GUI_Ev3_Myo_Robot/blo
  * Connect Your Lego MindStorms Brick to Same [Wi-fi Connection](https://uk.mathworks.com/help/supportpkg/legomindstormsev3io/ug/connect-to-an-ev3-brick-over-wifi.html?requestedDomain=www.mathworks.com) as the App.
  * Run the App on Visual Studio 2015 in Debug 86X on the local machine.
 
-### Ev3 Port's To Gesture
+### Ev3 Gesture/Controls/Ports
 These are the following Ports each Gesture Controls and there associated speeds:
 
 Motor Ports: A, B, C, D
-* Fist Gesture   - (Port D, Speed 100) and (Port C, Speed 100)
-* Finger Spread  - (Port D, Speed -100) and (Port C , Speed -100)
-* Wave In        - (Port D, Speed 100) and (Port C , Speed -55)
-* Wave Out       - (Port D, Speed -55) and (Port C , Speed 100)
-* Pinch          - (Port B, Speed -48)
-* Pinch (Again)  - (Port B, Speed 35)
-* Rest           - Stops all Motors in all ports
 
 Sensor Ports: 1, 2, 3, 4
 
+|     Gesture     |     Port: (x)   |  Speed   |    Port: (y)    |   Speed  |    Result       | 
+| :-------------: | :-------------: | :-----:  | :-------------: | :------: | :-------------: |
+| Fist            |        D        |   100    |        C        |   -100   |   Go Forward    |
+| Finger Spread   |        D        |   -100   |        C        |   -100   |   Go Backwards  |  
+| Wave In         |        D        |   100    |        C        |   -55    |   Turn Right    |
+| Wave Out        |        D        |   -55    |        C        |   100    |   Turn Left     |
+| Pinch           |        B        |   -48    |                 |          |   Bucket Up     |
+| Pinch(Again     |        B        |   35     |                 |          |   Bucket Down   |
+| Rest            |                 |          |                 |          |   Rest          |
+
+
 Only the IR sensor is used, and is connected to port one to grab the Sensors SIV value
 * Port One - Raw Value 
- 
-### Gestures(Controls) Used:
-Controls for the Robot were as Follows:
- * Move Robot Forward - Fist Gesture.
- * Move Robot Backwards – Finger Spread.
- * Move Robot Right – Wave Out.
- * Move Robot Left – Wave In.
- * Move Robot Bucket Up – Pinch.
- * Move Robot Bucket Down – Pinch Twice.
- * Stop Robot Moving - Rest.
   
 ### External Api's Used
 [LegoEv3](https://github.com/BrianPeek/legoev3)  Wrapper to connect Uwp to the Lego Brick.

@@ -1,26 +1,27 @@
-```
-                                   _______           ______  
-                                  (  ____ \|\     /|/ ___  \ 
-                                  | (    \/| )   ( |\/   \  \
-                                  | (__    | |   | |   ___) /
-                                  |  __)   ( (   ) )  (___ ( 
-                                  | (       \ \_/ /       ) \
-                                  | (____/\  \   /  /\___/  /
-                                  (_______/   \_/   \______/ 
 
-        ______   _______  _______ _________ _______  _______           _______  _______ 
-       (  __  \ (  ____ \(  ____ \\__   __/(  ____ )(  ___  )|\     /|(  ____ \(  ____ )
-       | (  \  )| (    \/| (    \/   ) (   | (    )|| (   ) |( \   / )| (    \/| (    )|
-       | |   ) || (__    | (_____    | |   | (____)|| |   | | \ (_) / | (__    | (____)|
-       | |   | ||  __)   (_____  )   | |   |     __)| |   | |  \   /  |  __)   |     __)
-       | |   ) || (            ) |   | |   | (\ (   | |   | |   ) (   | (      | (\ (   
-       | (__/  )| (____/\/\____) |   | |   | ) \ \__| (___) |   | |   | (____/\| ) \ \__
-       (______/ (_______/\_______)   )_(   |/   \__/(_______)   \_/   (_______/|/   \__/                                                                                                                                              
- ```
+                                                 _______           ______  
+                                                (  ____ \|\     /|/ ___  \ 
+                                                | (    \/| )   ( |\/   \  \
+                                                | (__    | |   | |   ___) /
+                                                |  __)   ( (   ) )  (___ ( 
+                                                | (       \ \_/ /       ) \
+                                                | (____/\  \   /  /\___/  /
+                                                (_______/   \_/   \______/ 
+
+                      ______   _______  _______ _________ _______  _______           _______  _______ 
+                     (  __  \ (  ____ \(  ____ \\__   __/(  ____ )(  ___  )|\     /|(  ____ \(  ____ )
+                     | (  \  )| (    \/| (    \/   ) (   | (    )|| (   ) |( \   / )| (    \/| (    )|
+                     | |   ) || (__    | (_____    | |   | (____)|| |   | | \ (_) / | (__    | (____)|
+                     | |   | ||  __)   (_____  )   | |   |     __)| |   | |  \   /  |  __)   |     __)
+                     | |   ) || (            ) |   | |   | (\ (   | |   | |   ) (   | (      | (\ (   
+                     | (__/  )| (____/\/\____) |   | |   | ) \ \__| (___) |   | |   | (____/\| ) \ \__
+                     (______/ (_______/\_______)   )_(   |/   \__/(_______)   \_/   (_______/|/   \__/                                                                                                                                              
  
 ### Introduction
 
-The idea for this project was to build a [ Lego Mindstorms Ev3](https://www.lego.com/en-us/mindstorms) Robot, that I can Control Via the [MYO Armband](https://www.myo.com/) using different hand gestures.  
+The idea for this project was to build a [ Lego Mindstorms Ev3](https://www.lego.com/en-us/mindstorms) Robot, that I can Control Via the [MYO Armband](https://www.myo.com/) using different hand gestures.
+
+To add a bit more funstionalty to the Robot, i mounted my phone to the front of the robot which was running Skype, i then send a video request to another Skpe application running on my Laptop. From this, i was able to drive the robot around with a first person view of where i was going without keeping the robot in sight.
 
 The project will be built using UWP. 
 
@@ -32,7 +33,7 @@ The project will be built using UWP.
 ### Features
  * Automatically Connects to Myo Armband Via bluetooth
  * Automatically Connects to Lego Brick via Wifi
- * Webcam Streaming To the App
+ * Webcam Streaming To the App (Optional & not fully implemented)
  
 ### Running the Project
  To Run the project please follow the steps Below:
